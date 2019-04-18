@@ -8,3 +8,5 @@ config :elenchos_ex, ElenchosExWeb.Endpoint,
 
 # Print only warnings and errors during test
 config :logger, level: :warn
+
+config :elenchos_ex, :code_dir, "/tmp"

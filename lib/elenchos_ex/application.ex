@@ -6,16 +6,14 @@ defmodule ElenchosEx.Application do
   use Application
 
   def start(_type, _args) do
-    # List all child processes to be supervised
+    PersistentEts.new(:foo, "releases.tab", [:named_table])
+
     children = [
-      # Start the endpoint when the application starts
       ElenchosExWeb.Endpoint
       # Starts a worker by calling: ElenchosEx.Worker.start_link(arg)
       # {ElenchosEx.Worker, arg},
     ]
 
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
     opts = [strategy: :one_for_one, name: ElenchosEx.Supervisor]
     Supervisor.start_link(children, opts)
   end
