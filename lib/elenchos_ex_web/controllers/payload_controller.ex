@@ -4,6 +4,15 @@ defmodule ElenchosExWeb.PayloadController do
   def index(conn, payload) do
     # Determin if the payload is a push or PR
     case payload do
+      %{"ref" => "refs/heads/master"} ->
+        # Push to master
+        text conn, "Ignoring push to master"
+      %{"ref" => _ref, "commits" => _commits, "before" => "0000000000000000000000000000000000000000"} ->
+        # Inital Push to branch
+        text conn, "Initial Push"
+      %{"ref" => _ref, "commits" => _commits} ->
+        # Push to branch
+        text conn, "Push"
       %{"pull_request" => pr, "action" => "opened"} ->
         # Handle PR open
         text conn, "PR open"
@@ -11,14 +20,8 @@ defmodule ElenchosExWeb.PayloadController do
         # Handle PR closed
         text conn, "PR closed"
       %{"pull_request" => pr, "action" => "reopened"} ->
-        # Handle PR
+        # Handle PR reopen
         text conn, "PR repoened"
-      %{"ref" => "refs/heads/master"} ->
-        # Push to master
-        text conn, "Ignoring push to master"
-      %{"ref" => _ref, "commits" => _commits} ->
-        # Push to branch
-        text conn, "Updating PR"
       _ ->
         text conn, "No action taken"
     end

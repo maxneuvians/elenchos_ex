@@ -21,7 +21,7 @@ defmodule ElenchosExWeb.PayloadControllerTest do
 
     test "POST / with a push to initial branch", %{conn: conn} do
       conn = post(conn, "/", push_to_initial_branch())
-      assert response(conn, 200) == "Updating PR"
+      assert response(conn, 200) == "Initial Push"
     end
 
     test "POST / with a a push to master", %{conn: conn} do
@@ -36,7 +36,7 @@ defmodule ElenchosExWeb.PayloadControllerTest do
 
     test "POST / with a push to a branch", %{conn: conn} do
       conn = post(conn, "/", update_to_branch())
-      assert response(conn, 200) == "Updating PR"
+      assert response(conn, 200) == "Push"
     end
 
   end
