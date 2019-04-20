@@ -10,3 +10,4 @@ config :elenchos_ex, ElenchosExWeb.Endpoint,
 config :logger, level: :warn
 
 config :elenchos_ex, :code_dir, "/tmp"
+config :elenchos_ex, :db, "releases_test.tab"

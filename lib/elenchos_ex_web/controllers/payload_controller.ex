@@ -7,7 +7,7 @@ defmodule ElenchosExWeb.PayloadController do
       %{"ref" => "refs/heads/master"} ->
         # Push to master
         text conn, "Ignoring push to master"
-      %{"ref" => _ref, "commits" => _commits, "before" => "0000000000000000000000000000000000000000"} ->
+      %{"ref" => _ref, "commits" => _commits, "before" => "000" <> _rest} ->
         # Inital Push to branch
         text conn, "Initial Push"
       %{"ref" => _ref, "commits" => _commits} ->

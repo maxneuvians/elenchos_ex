@@ -1,15 +1,14 @@
 defmodule ElenchosEx.Application do
-  # See https://hexdocs.pm/elixir/Application.html
-  # for more information on OTP Applications
   @moduledoc false
 
   use Application
 
   def start(_type, _args) do
-    PersistentEts.new(:foo, "releases.tab", [:named_table])
+    PersistentEts.new(:releases, Application.get_env(:elenchos_ex, :db, "releases.tab"), [:set, :named_table, :public])
 
     children = [
-      ElenchosExWeb.Endpoint
+      ElenchosExWeb.Endpoint,
+      {ElenchosEx.DeploymentSupervisor, []}
       # Starts a worker by calling: ElenchosEx.Worker.start_link(arg)
       # {ElenchosEx.Worker, arg},
     ]

@@ -48,3 +48,4 @@ config :phoenix, :stacktrace_depth, 20
 config :phoenix, :plug_init_mode, :runtime
 
 config :elenchos_ex, :code_dir, "/tmp"
+config :elenchos_ex, :db, "releases_dev.tab"
