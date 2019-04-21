@@ -1,5 +1,5 @@
 defmodule ElenchosEx.Release.Model do
-  defstruct [:cluster_id, :cluster_state, :full_name, :pr_state, :ref, :sha]
+  defstruct [:cluster_id, :cluster_state, :deployment_state, :full_name, :ip, :polling_counter, :pr_state, :ref, :sha]
 end
 
 
