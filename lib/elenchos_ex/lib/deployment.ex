@@ -47,31 +47,31 @@ defmodule ElenchosEx.Deployment do
   end
 
   def handle_info(:await_deployment, state) do
-    Logger.info "Awaiting cluster deployment for #{state.ref}"
+    Logger.info "Awaiting cluster deployment for #{state.ref}:#{state.sha}"
     next()
     {:noreply, state}
   end
 
   def handle_info(:apply_configuration, state) do
-    Logger.info "Applying cluster configuration for #{state.ref}"
+    Logger.info "Applying cluster configuration for #{state.ref}:#{state.sha}"
     next()
     {:noreply, state}
   end
 
   def handle_info(:build_docker_files, state) do
-    Logger.info "Building docker files for #{state.ref}"
+    Logger.info "Building docker files for #{state.ref}:#{state.sha}"
     next()
     {:noreply, state}
   end
 
   def handle_info(:configure_kustomize, state) do
-    Logger.info "Configuring kustomize for #{state.ref}"
+    Logger.info "Configuring kustomize for #{state.ref}:#{state.sha}"
     next()
     {:noreply, state}
   end
 
   def handle_info(:create_cluster, state) do
-    Logger.info "Creating cluster for #{state.ref}"
+    Logger.info "Creating cluster for #{state.ref}:#{state.sha}"
     next()
     {:noreply, %{state | polling_counter: 0}}
   end
@@ -84,6 +84,7 @@ defmodule ElenchosEx.Deployment do
 
       :awaiting_deployment ->
         if state.ip do
+          Logger.info "#{state.ref}:#{state.sha} succesfully deployed!"
           {:noreply, %{state | deployment_state: :deployed}}
         else
           next(:poll_loadbalancer)
@@ -111,30 +112,48 @@ defmodule ElenchosEx.Deployment do
         next(:create_cluster)
         {:noreply, %{state | deployment_state: :creating_cluster}}
 
+      :deployed ->
+        {:noreply, state}
+
       _ ->
-        Logger.error "#{state.ref} is in an unkown state: #{state.deployment_state}"
+        Logger.error "#{state.ref}:#{state.sha} is in an unkown state: #{state.deployment_state}"
         {:noreply, state}
     end
   end
 
   def handle_info(:poll_cluster, state) do
-    Logger.info "Polling cluster for #{state.ref} (Attempt #{state.polling_counter})"
+    Logger.info "Polling cluster for #{state.ref}:#{state.sha} (Attempt #{state.polling_counter})"
     :timer.sleep(2_000)
     next()
-    {:noreply, %{state | polling_counter: state.polling_counter + 1}}
+    if state.polling_counter == 10 do
+      {:noreply, %{state | cluster_id: "abcd", polling_counter: 0}}
+    else
+      {:noreply, %{state | polling_counter: state.polling_counter + 1}}
+    end
   end
 
   def handle_info(:poll_loadbalancer, state) do
-    Logger.info "Polling loadbalancer for #{state.ref} (Attempt #{state.polling_counter})"
+    Logger.info "Polling loadbalancer for #{state.ref}:#{state.sha} (Attempt #{state.polling_counter})"
     :timer.sleep(2_000)
     next()
-    {:noreply, %{state | polling_counter: state.polling_counter + 1}}
+    if state.polling_counter == 5 do
+      {:noreply, %{state | ip: "abcd", polling_counter: 0}}
+    else
+      {:noreply, %{state | polling_counter: state.polling_counter + 1}}
+    end
   end
 
   def handle_info(:reset, state) do
     Logger.info "Resetting deployment process for #{state.ref}"
-    next()
-    {:noreply, %{state | deployment_state: :initial}}
+    case state.deployment_state do
+      :initial ->
+        {:noreply, state}
+      :creating_cluster ->
+        {:noreply, state}
+      _ ->
+        next()
+        {:noreply, %{state | deployment_state: :initial}}
+    end
   end
 
   @doc """

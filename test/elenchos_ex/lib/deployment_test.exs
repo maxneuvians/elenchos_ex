@@ -103,10 +103,22 @@ defmodule ElenchosEx.DeploymentTest do
   end
 
   describe "reset" do
-    test "returns the state to :initial", %{rel: rel} do
+    test "returns the state to :initial unless it it initial or creating_cluster", %{rel: rel} do
       rel = %{rel | deployment_state: :huh}
       assert {:noreply, %{deployment_state: :initial}} = handle_info(:reset, rel)
       assert_receive :next, @message_delay
+    end
+
+    test "retains the initial state", %{rel: rel} do
+      rel = %{rel | deployment_state: :initial}
+      assert {:noreply, %{deployment_state: :initial}} = handle_info(:reset, rel)
+      refute_receive :next, @message_delay
+    end
+
+    test "retains the creating_cluster state", %{rel: rel} do
+      rel = %{rel | deployment_state: :creating_cluster}
+      assert {:noreply, %{deployment_state: :creating_cluster}} = handle_info(:reset, rel)
+      refute_receive :next, @message_delay
     end
   end
 end

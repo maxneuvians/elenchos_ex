@@ -35,4 +35,4 @@ elenchos_ex-*.tar
 # variables.
 /config/*.secret.exs
 /.elixir_ls/
-releases.tab
+*.tab
